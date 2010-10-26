@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/hudson/!svn/ver/10807/trunk/hudson/plugins/violations/src/main/java/hudson/plugins/violations/types/pylint
+END
+PyLintParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/svn/hudson/!svn/ver/10807/trunk/hudson/plugins/violations/src/main/java/hudson/plugins/violations/types/pylint/PyLintParser.java
+END
+PyLintDescriptor.java
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn/hudson/!svn/ver/10807/trunk/hudson/plugins/violations/src/main/java/hudson/plugins/violations/types/pylint/PyLintDescriptor.java
+END
