@@ -1,4 +1,4 @@
-package hudson.plugins.violations.types.pylint;
+package hudson.plugins.violations.types.xmllint;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,24 +17,24 @@ import hudson.plugins.violations.model.Violation;
 import hudson.plugins.violations.util.AbsoluteFileFinder;
 
 /**
- * Parser for parsing PyLint reports.
+ * Parser for parsing Xmllint reports.
  *
- * The parser only supports PyLint report that has the output format
+ * The parser only supports Xmllint report that has the output format
  * 'parseable'.
  *
  * @author Erik Ramfelt
  */
-public class PyLintParser implements ViolationsParser {
+public class XmllintParser implements ViolationsParser {
 
-    /** Regex pattern for the PyLint errors. */
+    /** Regex pattern for the Xmllint errors. */
     private final transient Pattern pattern;
     private transient AbsoluteFileFinder absoluteFileFinder = new AbsoluteFileFinder(); 
 
     /**
      * Constructor - create the pattern.
      */
-    public PyLintParser() {
-        pattern = Pattern.compile("(.*):(\\d+): \\[(\\D\\d*).*\\] (.*)");
+    public XmllintParser() {
+        pattern = Pattern.compile("(.*):(\\d+): (.*)");
     }
 
     /** {@inheritDoc} */
@@ -62,26 +62,26 @@ public class PyLintParser implements ViolationsParser {
     }
 
     /**
-     * Parses a PyLint line and adding a violation if regex
+     * Parses a Xmllint line and adding a violation if regex
      * @param model build model to add violations to
      * @param line the line in the file.
      * @param projectPath the path to use to resolve the file.
      */
     public void parseLine(FullBuildModel model, String line, File projectPath) {
-        PyLintViolation pyLintViolation = getPyLintViolation(line);
+        XmllintViolation xmllintViolation = getXmllintViolation(line);
 
-        if (pyLintViolation != null) {
+        if (xmllintViolation != null) {
 
             Violation violation = new Violation();
-            violation.setType("pylint");
-            violation.setLine(pyLintViolation.getLineStr());
-            violation.setMessage(pyLintViolation.getMessage());
-            violation.setSource(pyLintViolation.getViolationId());
-            setServerityLevel(violation, pyLintViolation.getViolationId());
+            violation.setType("xmllint");
+            violation.setLine(xmllintViolation.getLineStr());
+            violation.setMessage(xmllintViolation.getMessage());
+            violation.setSource(xmllintViolation.getViolationId());
+            setServerityLevel(violation, xmllintViolation.getViolationId());
 
             FullFileModel fileModel = getFileModel(model, 
-            		pyLintViolation.getFileName(), 
-            		absoluteFileFinder.getFileForName(pyLintViolation.getFileName()));
+            		xmllintViolation.getFileName(), 
+            		absoluteFileFinder.getFileForName(xmllintViolation.getFileName()));
             fileModel.addViolation(violation);
         }
     }
@@ -104,71 +104,52 @@ public class PyLintParser implements ViolationsParser {
     
 
     /**
-     * Returns a pylint violation (if it is one)
-     * @param line a line from the PyLint parseable report
-     * @return a PyLintViolation if the line contains one; null otherwise
+     * Returns a xmllint violation (if it is one)
+     * @param line a line from the Xmllint parseable report
+     * @return a XmllintViolation if the line contains one; null otherwise
      */
-    PyLintViolation getPyLintViolation(String line) {
+    XmllintViolation getXmllintViolation(String line) {
         Matcher matcher = pattern.matcher(line);
-        if (matcher.find() && matcher.groupCount() == 4) {
-            return new PyLintViolation(matcher);
+        if (matcher.find() && matcher.groupCount() == 3) {
+            return new XmllintViolation(matcher);
         }
         return null;
     }
 
     /**
-     * Returns the Severity level as an int from the PyLint message type.
+     * Returns the Severity level as an int from the Xmllint message type.
      *
      * The different message types are:
      * (C) convention, for programming standard violation
      * (R) refactor, for bad code smell
      * (W) warning, for python specific problems
      * (E) error, for much probably bugs in the code
-     * (F) fatal, if an error occured which prevented pylint from doing
+     * (F) fatal, if an error occured which prevented xmllint from doing
      *     further processing.
      *
-     * @param messageType the type of PyLint message
+     * @param messageType the type of Xmllint message
      * @return an int is matched to the message type.
      */
     private void setServerityLevel(Violation violation, String messageType) {
-
-        switch (messageType.charAt(0)) {
-            case 'C':
-                violation.setSeverity(Severity.LOW);
-                violation.setSeverityLevel(Severity.LOW_VALUE);
-                break;
-            case 'R':
-                violation.setSeverity(Severity.MEDIUM_LOW);
-                violation.setSeverityLevel(Severity.MEDIUM_LOW_VALUE);
-                break;
-            case 'W':
-            default:
-                violation.setSeverity(Severity.MEDIUM);
-                violation.setSeverityLevel(Severity.MEDIUM_VALUE);
-                break;
-            case 'E':
-            case 'F':
                 violation.setSeverity(Severity.HIGH);
                 violation.setSeverityLevel(Severity.HIGH_VALUE);
-                break;
-        }
     }
     
-    class PyLintViolation {
+    class XmllintViolation {
         private final transient String lineStr;
         private final transient String message;
         private final transient String fileName;
         private final transient String violationId;
 
-        public PyLintViolation(Matcher matcher) {
-            if (matcher.groupCount() < 4) {
+        public XmllintViolation(Matcher matcher) {
+            if (matcher.groupCount() < 3) {
                 throw new IllegalArgumentException(
                     "The Regex matcher could not find enough information");
             }
             lineStr = matcher.group(2);
-            message = matcher.group(4);
-            violationId = matcher.group(3);
+            message = matcher.group(3);
             fileName = matcher.group(1);
+            violationId = "C";
         }
 
         public String getLineStr() {
@@ -186,5 +167,6 @@ public class PyLintParser implements ViolationsParser {
         public String getViolationId() {
             return violationId;
         }
+
     }
 }
