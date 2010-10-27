@@ -15,6 +15,7 @@ import hudson.plugins.violations.types.stylecop.StyleCopDescriptor;
 import hudson.plugins.violations.types.jcreport.JcReportDescriptor;
 import hudson.plugins.violations.types.jslint.JsLintDescriptor;
 import hudson.plugins.violations.types.codenarc.CodenarcDescriptor;
+import hudson.plugins.violations.types.pep8.Pep8Descriptor;
 import hudson.plugins.violations.types.pyflakes.PyflakesDescriptor;
 import hudson.plugins.violations.types.xmllint.XmllintDescriptor;
 import hudson.plugins.violations.types.zptlint.ZptlintDescriptor;
@@ -94,6 +95,7 @@ public abstract class TypeDescriptor {
         addDescriptor(JcReportDescriptor.DESCRIPTOR);
         addDescriptor(JsLintDescriptor.DESCRIPTOR);
         addDescriptor(CodenarcDescriptor.DESCRIPTOR);
+        addDescriptor(Pep8Descriptor.DESCRIPTOR);
         addDescriptor(PyflakesDescriptor.DESCRIPTOR);
         addDescriptor(XmllintDescriptor.DESCRIPTOR);
         addDescriptor(ZptlintDescriptor.DESCRIPTOR);
